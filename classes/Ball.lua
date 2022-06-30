@@ -44,6 +44,33 @@ function Ball:reset()
     self.dy = 0
 end
 
+function Ball:hasCollidedWith(object)
+    if self.x + self.width < object.x or self.x > object.x + object.width then
+        return false;
+    end
+    if self.y + self.height < object.y or self.y > object.y + object.height then
+        return false
+    end
+    return true
+end
+
+function Ball:checkCollisionsAndDeflect(objects)
+    for i = 1, #objects do
+        if self:hasCollidedWith(objects[i]) then
+            if self.x < objects[i].x then
+                self.dx = -self.dx
+            else
+                self.dx = -self.dx
+            end
+            if self.y < objects[i].y then
+                self.dy = -self.dy
+            else
+                self.dy = -self.dy
+            end
+        end
+    end
+end
+
 function Ball:update(dt, screen_width, screen_height)
     if self.x + self.width >= screen_width or self.x <= 0 then
         self.dx = -self.dx

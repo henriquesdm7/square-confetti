@@ -7,12 +7,15 @@ WINDOW_HEIGHT = 600
 VIRTUAL_WIDTH = 432
 VIRTUAL_HEIGHT = 243
 
-BALLS_QUANTITY = 100
+BALLS_QUANTITY = 20
 
 require 'classes.Ball'
+require 'classes.Wall'
 
 --[[ Called to load the game, only once. ]]
 function love.load()
+    math.randomseed(os.time())
+
     love.graphics.setDefaultFilter("nearest", "nearest")
 
     push:setupScreen(VIRTUAL_WIDTH, VIRTUAL_HEIGHT, WINDOW_WIDTH, WINDOW_HEIGHT, {
@@ -22,17 +25,21 @@ function love.load()
     })
 
     balls = {}
+    walls = {
+        -- Wall(100, 10, 20, 100),
+        -- Wall(0, 10, 100, 20),
+        -- Wall(0, 90, 90, 20)
+    }
 
     for i = 1, BALLS_QUANTITY do
-        ball = Ball(VIRTUAL_WIDTH / 2 - 7, VIRTUAL_HEIGHT / 2 - 7, 7, 7)
 
-        ball.dy = math.random(2) == 1 and -math.random(1, 190) or math.random(1, 190)
-        ball.dx = math.random(2) == 1 and -math.random(1, 190) or math.random(1, 190)
+        ball = Ball(VIRTUAL_WIDTH / 2 - 7, VIRTUAL_HEIGHT / 2 - 7, 3, 3)
+
+        ball.dy = ((math.random(2) == 1) and (-math.random(60, 190)) or (math.random(60, 190)))
+        ball.dx = ((math.random(2) == 1) and (-math.random(60, 190)) or (math.random(60, 190)))
 
         table.insert(balls, ball)
     end
-
-    math.randomseed(os.time())
 end
 
 --[[ Called everytime a key is pressed ]]
@@ -51,11 +58,12 @@ end
 function love.update(dt)
     if (dt <= .1) then
         for i = 1, BALLS_QUANTITY do
+            balls[i]:checkCollisionsAndDeflect(walls)
             balls[i]:update(dt, VIRTUAL_WIDTH, VIRTUAL_HEIGHT)
         end
-        -- ball1:update(dt, VIRTUAL_WIDTH, VIRTUAL_HEIGHT)
-        -- ball2:update(dt, VIRTUAL_WIDTH, VIRTUAL_HEIGHT)
-        -- ball3:update(dt, VIRTUAL_WIDTH, VIRTUAL_HEIGHT)
+        for i = 1, #walls do
+            walls[i]:update(dt, VIRTUAL_WIDTH, VIRTUAL_HEIGHT)
+        end
     end
 end
 
@@ -71,13 +79,15 @@ function love.draw()
     for i = 1, BALLS_QUANTITY do
         balls[i]:draw()
     end
-    --[[ Balls rendering ]]
+    for i = 1, #walls do
+        walls[i]:draw()
+    end
 
     love.graphics.rectangle("fill", VIRTUAL_WIDTH / 2 - 4, VIRTUAL_HEIGHT / 2 - 4, 1, 1)
 
-    -- show fps
+    --[[ Show fps ]]
     love.graphics.setFont(love.graphics.newFont(10))
-    love.graphics.setColor(0, 1, 0, 1)
+    love.graphics.setColor(.5, .6, .1, 1)
     love.graphics.print('FPS: ' .. tostring(love.timer.getFPS()), 10, 10)
 
     push:apply('end')
