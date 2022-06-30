@@ -93,7 +93,7 @@ end
 --[[ Called every frame, after update ]]
 function love.draw()
     push:apply('start')
-    -- 93E1D8
+
     love.graphics.clear(0.57, 0.88, 0.84, 1)
 
     love.graphics.setColor(0, 0, 0, 1)
